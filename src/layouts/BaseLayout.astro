@@ -1,0 +1,97 @@
+---
+/*
+ * BASE LAYOUT
+ * The shell every page is wrapped in: <html>, <head>, fonts, global
+ * styles, Header and Footer. A page supplies only its own content,
+ * which Astro drops in where <slot /> sits below.
+ *
+ * Usage, in any page:
+ *   <BaseLayout title="Heritage" description="...">
+ *     ...page content...
+ *   </BaseLayout>
+ */
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { url } from '../utils/url';
+
+// Props are the inputs a page passes in. "?" means optional.
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'Forge & Patina. Heritage forged wheels, reissued by craft in Cologne.',
+} = Astro.props;
+
+// "The Halden 71 — Forge & Patina", or just the brand on the home page.
+const pageTitle = title ? `${title} — Forge & Patina` : 'Forge & Patina';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
+    <link rel="icon" href={url('favicon.ico')} />
+
+    <!-- Google Fonts: Cormorant Garamond for headings, DM Sans for body/UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <Header />
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <script>
+      // ─────────────────────────────────────────────────────────────
+      // SCROLL-TRIGGERED FADE-INS
+      //
+      // Every element with [data-animate] fades up the first time it
+      // enters the viewport. Lives in the layout so it works on every
+      // page without each page repeating it.
+      //
+      // data-delay="150" on an element staggers it after its siblings.
+      // ─────────────────────────────────────────────────────────────
+
+      const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+
+          const el = entry.target as HTMLElement;
+
+          // Apply stagger delay if the element specifies one
+          el.style.transitionDelay = (el.dataset.delay || 0) + 'ms';
+
+          // This class change triggers the CSS transition
+          el.classList.add('is-visible');
+
+          // Unobserve after animating — it only needs to animate once
+          scrollObserver.unobserve(el);
+        });
+      }, {
+        threshold: 0.12,     // fire when 12% of the element is in the viewport
+      });
+
+      document
+        .querySelectorAll('[data-animate]')
+        .forEach(el => scrollObserver.observe(el));
+    </script>
+  </body>
+</html>

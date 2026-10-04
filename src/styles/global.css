@@ -1,0 +1,158 @@
+/* ============================================================
+   GLOBAL STYLES
+   Imported once, in BaseLayout.astro, so they apply to every page.
+   Only things that are truly site-wide live here: design tokens,
+   the reset, and a few utilities used by many components.
+   Everything else lives inside its own component's <style> block.
+============================================================ */
+
+
+/* ============================================================
+   DESIGN TOKENS — single source of truth.
+   Change a value here and it updates everywhere on the site.
+============================================================ */
+:root {
+  /* Colours */
+  --parchment:  #F4EFE6;   /* primary background — warm off-white */
+  --ink:        #1C1814;   /* dark sections, primary text — warm near-black */
+  --bronze:     #B8824A;   /* accent — CTA, hairlines, highlights */
+  --stone:      #8A7F76;   /* secondary text, captions, nav */
+  --warm-white: #EAE4DB;   /* alternate light section background */
+  --dust:       #D4CDC4;   /* borders and dividers */
+
+  /* Typography */
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans:  'DM Sans', system-ui, -apple-system, sans-serif;
+
+  /* Layout */
+  --header-height: 64px;
+}
+
+
+/* ============================================================
+   RESET + BASE
+============================================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--sans);
+  font-weight: 300;
+  font-size: 17px;
+  line-height: 1.75;
+  color: var(--ink);
+  background: var(--parchment);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Buttons inherit body font — browser default overrides this otherwise */
+button {
+  font: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+
+/* ============================================================
+   UTILITY: SECTION LABEL
+   "SINCE 1971", "TECHNICAL DATA", "ATELIER" — small uppercase
+   eyebrow text that sits above a heading.
+============================================================ */
+.label {
+  display: block;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+
+/* UTILITY: BRONZE HAIRLINE RULE */
+.rule {
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--bronze);
+  margin: 18px 0 26px;
+}
+
+
+/* ============================================================
+   SKIP LINK
+   Invisible until a keyboard user presses Tab on page load.
+   Lets them jump past the header straight to the page content.
+============================================================ */
+.skip-link {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 200;
+  padding: 10px 18px;
+  background: var(--parchment);
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+
+/* ============================================================
+   SCROLL ANIMATIONS
+   Elements with [data-animate] start invisible and slightly
+   low. When they enter the viewport, the script in BaseLayout
+   adds .is-visible — which triggers these CSS transitions.
+   Timing is deliberately slow and editorial (1000ms).
+============================================================ */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1000ms ease, transform 1000ms ease;
+}
+
+[data-animate].is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+
+/* ============================================================
+   REDUCED MOTION
+   Visitors who ask their OS for less motion get the content
+   immediately, with no fades or smooth scrolling.
+============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  [data-animate] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

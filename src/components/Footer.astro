@@ -1,0 +1,54 @@
+---
+/*
+ * FOOTER
+ * Identical on every page. id="contact" is the target of the
+ * "Contact" link in the header, so that link works from any page.
+ */
+---
+
+<footer class="footer" id="contact">
+  <span class="footer__logo">Forge &amp; Patina</span>
+  <p class="footer__location">Forged in Cologne &mdash; MMXXV</p>
+  <p class="footer__credits">
+    Photography: Chudi Njeako &middot; Stuart Garage &middot; Rob Wingate &middot; Bradikan<br />
+    All photographs sourced from Unsplash and used under the Unsplash License.
+  </p>
+</footer>
+
+<style>
+  /* Scoped: Astro rewrites these selectors so they only match
+     elements in this file. A .footer__logo elsewhere is unaffected. */
+  .footer {
+    background: var(--ink);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 64px 40px;
+    text-align: center;
+  }
+
+  .footer__logo {
+    display: block;
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--parchment);
+    margin-bottom: 14px;
+  }
+
+  .footer__location {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 300;
+    color: var(--stone);
+    margin-bottom: 28px;
+  }
+
+  .footer__credits {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 300;
+    line-height: 1.9;
+    color: rgba(138, 127, 118, 0.45);
+  }
+</style>

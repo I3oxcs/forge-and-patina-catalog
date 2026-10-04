@@ -1,0 +1,243 @@
+---
+/*
+ * HEADER
+ * Fixed at the top of every page. Transparent over the dark band each
+ * page opens with; gets a solid ink background after 80px of scroll.
+ *
+ * Everything between the --- fences runs at BUILD time, once per page.
+ * The browser never sees this code — only the HTML it produces.
+ */
+import { url } from '../utils/url';
+
+// The nav is data: change this list and every page's header updates.
+const links = [
+  { label: 'The Collection', href: url('wheels/') },
+  { label: 'Heritage',       href: url('heritage/') },
+  { label: 'Contact',        href: '#contact' },
+];
+
+// Astro.url is the address of the page currently being built.
+// Trailing slashes are stripped so "/heritage" and "/heritage/" compare equal.
+const stripSlash = (path: string) => path.replace(/\/$/, '');
+const currentPath = stripSlash(Astro.url.pathname);
+
+// A link is active on its own page and on any page below it,
+// so "The Collection" stays highlighted on /wheels/halden-71/ too.
+function isActive(href: string) {
+  if (href.startsWith('#')) return false;
+  const target = stripSlash(href);
+  return currentPath === target || currentPath.startsWith(target + '/');
+}
+---
+
+<header class="header">
+  <div class="header__inner">
+    <a href={url('')} class="header__logo" aria-label="Forge &amp; Patina — home">
+      Forge &amp; Patina
+    </a>
+
+    <!-- Only visible below 768px. Opens the nav as a full-screen panel. -->
+    <button
+      class="header__toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="primary-nav"
+    >
+      Menu
+    </button>
+
+    <nav class="header__nav" id="primary-nav" aria-label="Primary">
+      {links.map(({ label, href }) => (
+        <a
+          href={href}
+          class:list={{ active: isActive(href) }}
+          aria-current={isActive(href) ? 'page' : undefined}
+        >
+          {label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    height: var(--header-height);
+    /* JS adds .scrolled — these properties transition to their new values */
+    transition: background 400ms ease, border-color 400ms ease;
+  }
+
+  .header.scrolled {
+    background: var(--ink);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .header__inner {
+    max-width: 1240px;
+    margin: 0 auto;
+    height: 100%;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header__logo {
+    font-family: var(--sans);
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--parchment);
+  }
+
+  .header__nav {
+    display: flex;
+    gap: 36px;
+  }
+
+  .header__nav a {
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--stone);
+    position: relative;
+    transition: color 300ms ease;
+  }
+
+  /* Underline slides in from the left on hover or when active */
+  .header__nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--bronze);
+    transition: width 300ms ease;
+  }
+
+  .header__nav a:hover,
+  .header__nav a.active {
+    color: var(--parchment);
+  }
+
+  .header__nav a:hover::after,
+  .header__nav a.active::after {
+    width: 100%;
+  }
+
+  /* Menu button — hidden on desktop */
+  .header__toggle {
+    display: none;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--parchment);
+  }
+
+
+  /* ============================================================
+     MOBILE — below 768px the nav becomes a full-screen ink panel
+     that opens when the header has .menu-open.
+  ============================================================ */
+  @media (max-width: 768px) {
+    .header__inner {
+      padding: 0 32px;
+    }
+
+    .header__toggle {
+      display: block;
+    }
+
+    .header__nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      /* z-index -1 inside the header: the panel covers the page,
+         but the logo and Menu button still sit on top of it. */
+      z-index: -1;
+      flex-direction: column;
+      justify-content: center;
+      gap: 28px;
+      padding: var(--header-height) 32px;
+      background: var(--ink);
+    }
+
+    .header.menu-open .header__nav {
+      display: flex;
+    }
+
+    .header__nav a {
+      align-self: flex-start;
+      font-family: var(--serif);
+      font-size: 40px;
+      font-weight: 300;
+      letter-spacing: 0.02em;
+      line-height: 1.1;
+      text-transform: none;
+    }
+  }
+</style>
+
+<script>
+  // Astro bundles this script and loads it once per page.
+  // It runs in the browser, unlike the code in the --- fences above.
+
+  const header = document.querySelector<HTMLElement>('.header');
+  const toggle = document.querySelector<HTMLButtonElement>('.header__toggle');
+
+  if (header && toggle) {
+
+    // ─────────────────────────────────────────────────────────────
+    // 1. HEADER BACKGROUND ON SCROLL
+    //
+    // Past 80px, add .scrolled — CSS transitions the background to ink.
+    // Also run once on load, in case the page opens already scrolled
+    // (e.g. after a reload halfway down).
+    // ─────────────────────────────────────────────────────────────
+    const updateScrolled = () => {
+      header.classList.toggle('scrolled', window.scrollY > 80);
+    };
+    updateScrolled();
+    window.addEventListener('scroll', updateScrolled, { passive: true });
+
+
+    // ─────────────────────────────────────────────────────────────
+    // 2. MOBILE MENU
+    //
+    // aria-expanded tells screen readers whether the menu is open.
+    // While open, the page behind it is locked so it can't scroll.
+    // ─────────────────────────────────────────────────────────────
+    const setMenuOpen = (open: boolean) => {
+      header.classList.toggle('menu-open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.textContent = open ? 'Close' : 'Menu';
+      document.body.style.overflow = open ? 'hidden' : '';
+    };
+
+    toggle.addEventListener('click', () => {
+      setMenuOpen(!header.classList.contains('menu-open'));
+    });
+
+    // Close after choosing a link — needed for "Contact", which
+    // scrolls within the page rather than loading a new one.
+    header.querySelectorAll('.header__nav a').forEach(link => {
+      link.addEventListener('click', () => setMenuOpen(false));
+    });
+
+    // Escape closes the menu and returns focus to the button.
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && header.classList.contains('menu-open')) {
+        setMenuOpen(false);
+        toggle.focus();
+      }
+    });
+  }
+</script>
