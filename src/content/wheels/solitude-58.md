@@ -36,8 +36,9 @@ finishes:
     code: RS-58
     swatch: racing-silver
 
-# No photograph yet — the page shows a placeholder until one is added.
-images: []
+images:
+  - src: ../../assets/wheels/solitude-58.jpg
+    alt: A dished steel wheel with a chrome centre nut on a black Porsche 356
 ---
 
 In 1958 the road circuit at Solitude, in the hills above Stuttgart, was seven miles of
