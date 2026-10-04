@@ -1,8 +1,101 @@
 ---
+/*
+ * THE COLLECTION — /wheels/
+ * Every wheel in the archive, oldest first. Nothing on this page is
+ * typed in by hand except the intro: the cards, the year range and
+ * the shortest lead time all come from the wheel files.
+ */
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import StagePlaceholder from '../../components/StagePlaceholder.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import WheelGrid from '../../components/WheelGrid.astro';
+import { getWheels } from '../../utils/wheels';
+
+const wheels = await getWheels();
+
+const firstYear = wheels[0].data.year;
+const lastYear  = wheels[wheels.length - 1].data.year;
+const shortestLeadTime = Math.min(...wheels.map(wheel => wheel.data.leadTimeWeeks));
 ---
 
-<BaseLayout title="The Collection">
-  <StagePlaceholder label="Four wheels" title="The Collection" stage={3} />
+<BaseLayout
+  title="The Collection"
+  description={`Every Forge & Patina wheel, ${firstYear}–${lastYear}. Reissued from the original drawings in Cologne.`}
+>
+
+  <!-- ============================================================
+       INTRO — ink band, so the transparent header sits on dark
+  ============================================================ -->
+  <section class="intro">
+    <div class="intro__inner">
+      <Eyebrow text={`The Collection · ${firstYear}–${lastYear}`} />
+      <h1 class="intro__title" data-animate>
+        Four wheels.<br />Four decades.
+      </h1>
+      <p class="intro__copy" data-animate data-delay="150">
+        Each was drawn for a single purpose: a circuit, a race, a kind of driving.
+        Each is reissued from its original drawings at our Cologne atelier and made
+        to order, from {shortestLeadTime} weeks.
+      </p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       THE WHEELS
+  ============================================================ -->
+  <section class="collection">
+    <div class="collection__inner">
+      <WheelGrid wheels={wheels} />
+    </div>
+  </section>
+
 </BaseLayout>
+
+<style>
+  .intro {
+    background: var(--ink);
+    padding: calc(var(--header-height) + 120px) 40px 100px;
+  }
+
+  .intro__inner {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  .intro__title {
+    font-family: var(--serif);
+    font-size: clamp(48px, 6vw, 88px);
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: 0.02em;
+    color: var(--parchment);
+    margin-bottom: 32px;
+  }
+
+  .intro__copy {
+    max-width: 520px;
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--stone);
+  }
+
+  .collection {
+    background: var(--parchment);
+    padding: 100px 40px 120px;
+  }
+
+  .collection__inner {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 768px) {
+    .intro {
+      padding: calc(var(--header-height) + 64px) 28px 72px;
+    }
+
+    .collection {
+      padding: 72px 28px 96px;
+    }
+  }
+</style>

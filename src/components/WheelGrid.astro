@@ -1,0 +1,49 @@
+---
+/*
+ * WHEEL GRID
+ * A row of ProductCards. Used for the full catalog (4 wheels) and
+ * for "Also from the archive" on each wheel page (the other 3).
+ * The number of columns follows the number of wheels passed in.
+ */
+import type { CollectionEntry } from 'astro:content';
+import ProductCard from './ProductCard.astro';
+
+interface Props {
+  wheels: CollectionEntry<'wheels'>[];
+  headingLevel?: 2 | 3;   // passed on to each card
+}
+
+const { wheels, headingLevel } = Astro.props;
+---
+
+<ul class="grid" style={{ '--columns': wheels.length }}>
+  {wheels.map((wheel, i) => (
+    <li data-animate data-delay={i * 120}>
+      <ProductCard wheel={wheel} headingLevel={headingLevel} />
+    </li>
+  ))}
+</ul>
+
+<style>
+  .grid {
+    list-style: none;
+    display: grid;
+    /* --columns is set from the number of wheels, above */
+    grid-template-columns: repeat(var(--columns), 1fr);
+    gap: 56px 32px;
+  }
+
+  /* Tablet: two per row */
+  @media (max-width: 1024px) {
+    .grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* Phone: one per row */
+  @media (max-width: 560px) {
+    .grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

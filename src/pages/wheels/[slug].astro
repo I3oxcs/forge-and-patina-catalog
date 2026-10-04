@@ -7,7 +7,7 @@
  *
  *   src/content/wheels/halden-71.md  →  /wheels/halden-71/
  */
-import { getCollection, render, type CollectionEntry } from 'astro:content';
+import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SplitHero from '../../components/SplitHero.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
@@ -16,23 +16,27 @@ import SizeSelector from '../../components/SizeSelector.astro';
 import FinishSwatch from '../../components/FinishSwatch.astro';
 import Gallery from '../../components/Gallery.astro';
 import Atelier from '../../components/Atelier.astro';
+import WheelGrid from '../../components/WheelGrid.astro';
 import { formatPrice, formatSize, formatSizes, shortName } from '../../utils/format';
+import { getWheels } from '../../utils/wheels';
 
 // Runs once, at build time. Returns one entry per page to create:
 // `params` fills in [slug]; `props` is handed to that page.
+// Each page also gets the other wheels, for "Also from the archive".
 export async function getStaticPaths() {
-  const wheels = await getCollection('wheels');
+  const wheels = await getWheels();
   return wheels.map(wheel => ({
     params: { slug: wheel.id },
-    props:  { wheel },
+    props:  { wheel, others: wheels.filter(other => other.id !== wheel.id) },
   }));
 }
 
 interface Props {
   wheel: CollectionEntry<'wheels'>;
+  others: CollectionEntry<'wheels'>[];
 }
 
-const { wheel } = Astro.props;
+const { wheel, others } = Astro.props;
 const data = wheel.data;
 
 // The Markdown body (the origin story), ready to drop into the page.
@@ -117,6 +121,19 @@ const specRows = [
 
   <Atelier wheelName={shortName(data.name)} />
 
+
+  <!-- ============================================================
+       ALSO FROM THE ARCHIVE
+       The other wheels, oldest first — same cards as the catalog.
+  ============================================================ -->
+  <section class="archive">
+    <div class="archive__inner">
+      <Eyebrow text="The Collection" />
+      <h2 class="archive__heading" data-animate>Also from the archive</h2>
+      <WheelGrid wheels={others} headingLevel={3} />
+    </div>
+  </section>
+
 </BaseLayout>
 
 <style>
@@ -199,7 +216,32 @@ const specRows = [
     gap: 28px;
   }
 
+  /* ============================================================
+     ALSO FROM THE ARCHIVE
+  ============================================================ */
+  .archive {
+    background: var(--parchment);
+    padding: 100px 40px 120px;
+  }
+
+  .archive__inner {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  .archive__heading {
+    font-family: var(--serif);
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 300;
+    color: var(--ink);
+    margin-bottom: 52px;
+  }
+
   @media (max-width: 768px) {
+    .archive {
+      padding: 80px 28px 96px;
+    }
+
     .story {
       padding: 80px 28px;
     }

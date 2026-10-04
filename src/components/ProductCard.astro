@@ -1,0 +1,149 @@
+---
+/*
+ * PRODUCT CARD
+ * One wheel, as a link to its page: photo (or placeholder), year and
+ * origin, name, summary, price and finishes. The whole card is the link.
+ *
+ *   <ProductCard wheel={wheel} />
+ *   <ProductCard wheel={wheel} headingLevel={3} />   when the card sits under an <h2>
+ */
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import WheelPlaceholder from './WheelPlaceholder.astro';
+import { swatches } from '../data/swatches';
+import { formatPrice } from '../utils/format';
+import { url } from '../utils/url';
+
+interface Props {
+  wheel: CollectionEntry<'wheels'>;
+  headingLevel?: 2 | 3;
+}
+
+const { wheel, headingLevel = 2 } = Astro.props;
+const { name, year, origin, summary, price, finishes, images } = wheel.data;
+const photo = images[0];
+
+// A variable holding a tag name can be used as a tag: <Heading> becomes <h2> or <h3>.
+const Heading = `h${headingLevel}`;
+---
+
+<a href={url(`wheels/${wheel.id}/`)} class="card">
+
+  <div class="card__image">
+    {photo ? (
+      <Image
+        src={photo.src}
+        alt=""
+        widths={[400, 700, 1000]}
+        sizes="(max-width: 560px) 100vw, (max-width: 1024px) 50vw, 25vw"
+      />
+    ) : (
+      <WheelPlaceholder swatch={finishes[0].swatch} />
+    )}
+  </div>
+
+  <span class="label card__meta">{year} &middot; {origin}</span>
+  <Heading class="card__name">{name}</Heading>
+  <span class="card__rule" aria-hidden="true"></span>
+  <p class="card__summary">{summary}</p>
+
+  <div class="card__footer">
+    <span class="card__price">{formatPrice(price)} per wheel</span>
+    <span class="card__finishes" aria-hidden="true">
+      {finishes.map(finish => (
+        <span class="card__swatch" style={{ background: swatches[finish.swatch] }}></span>
+      ))}
+    </span>
+  </div>
+
+</a>
+
+<style>
+  .card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  /* Portrait frame; the photo is cropped to fill it */
+  .card__image {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: var(--ink);
+    margin-bottom: 24px;
+  }
+
+  .card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    /* Same barely-there scale as the gallery */
+    transition: transform 600ms ease;
+  }
+
+  .card:hover .card__image img {
+    transform: scale(1.02);
+  }
+
+  .card__meta {
+    margin-bottom: 8px;
+  }
+
+  .card__name {
+    font-family: var(--serif);
+    font-size: 30px;
+    font-weight: 300;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  /* Bronze hairline that grows on hover, echoing the nav underline */
+  .card__rule {
+    display: block;
+    width: 0;
+    height: 1px;
+    margin: 14px 0 16px;
+    background: var(--bronze);
+    transition: width 300ms ease;
+  }
+
+  .card:hover .card__rule,
+  .card:focus-visible .card__rule {
+    width: 40px;
+  }
+
+  .card__summary {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--stone);
+    margin-bottom: 20px;
+  }
+
+  /* Pushed to the bottom so prices line up across a row of cards */
+  .card__footer {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--dust);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .card__price {
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+  .card__finishes {
+    display: flex;
+    gap: 6px;
+  }
+
+  .card__swatch {
+    width: 14px;
+    height: 14px;
+  }
+</style>
