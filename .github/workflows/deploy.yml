@@ -1,0 +1,42 @@
+# Builds the site and publishes it to GitHub Pages.
+#
+# GitHub Pages can only serve finished HTML files, so every push to `main`
+# runs this on GitHub's computers: install dependencies, `astro build`,
+# then publish the resulting dist/ folder.
+#
+# Based on the official template: https://github.com/withastro/action
+
+name: Deploy to GitHub Pages
+
+on:
+  # Every push to main publishes the site
+  push:
+    branches: [main]
+  # Also allows a manual run from the repository's Actions tab
+  workflow_dispatch:
+
+# Allow this workflow to read the repository and publish to Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v7
+      - name: Install, build, and upload the site
+        uses: withastro/action@v6
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
