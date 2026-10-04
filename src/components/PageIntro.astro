@@ -1,0 +1,78 @@
+---
+/*
+ * PAGE INTRO
+ * The ink band that opens pages without a photo hero (catalog,
+ * heritage, 404). Being dark, it lets the transparent header sit
+ * on it the same way it sits on a SplitHero.
+ *
+ *   <PageIntro eyebrow="The Collection" title={['Four wheels.', 'Four decades.']}>
+ *     A short paragraph of introduction.
+ *   </PageIntro>
+ */
+import Eyebrow from './Eyebrow.astro';
+
+interface Props {
+  eyebrow: string;
+  title: string[];   // one entry per line
+  fullHeight?: boolean;
+}
+
+const { eyebrow, title, fullHeight = false } = Astro.props;
+---
+
+<section class:list={['intro', { 'intro--full': fullHeight }]}>
+  <div class="intro__inner">
+    <Eyebrow text={eyebrow} />
+    <h1 class="intro__title" data-animate>
+      {title.map((line, i) => <>{i > 0 && <br />}{line}</>)}
+    </h1>
+    {Astro.slots.has('default') && (
+      <div class="intro__copy" data-animate data-delay="150">
+        <slot />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .intro {
+    background: var(--ink);
+    padding: calc(var(--header-height) + 120px) 40px 100px;
+  }
+
+  /* Fills the screen — for pages that are only an intro, like 404 */
+  .intro--full {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .intro__inner {
+    max-width: 1240px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .intro__title {
+    font-family: var(--serif);
+    font-size: clamp(48px, 6vw, 88px);
+    font-weight: 300;
+    line-height: 1.0;
+    letter-spacing: 0.02em;
+    color: var(--parchment);
+    margin-bottom: 32px;
+  }
+
+  .intro__copy {
+    max-width: 520px;
+    font-size: 15px;
+    line-height: 1.9;
+    color: var(--stone);
+  }
+
+  @media (max-width: 768px) {
+    .intro {
+      padding: calc(var(--header-height) + 64px) 28px 72px;
+    }
+  }
+</style>

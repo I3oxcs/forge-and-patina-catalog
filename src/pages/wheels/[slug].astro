@@ -11,6 +11,7 @@ import { render, type CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SplitHero from '../../components/SplitHero.astro';
 import Eyebrow from '../../components/Eyebrow.astro';
+import StorySection from '../../components/StorySection.astro';
 import SpecTable from '../../components/SpecTable.astro';
 import SizeSelector from '../../components/SizeSelector.astro';
 import FinishSwatch from '../../components/FinishSwatch.astro';
@@ -66,24 +67,10 @@ const specRows = [
   />
 
 
-  <!-- ============================================================
-       STORY
-       The origin story from the Markdown file. Spare, editorial,
-       centred. The last paragraph is the punchline.
-  ============================================================ -->
-  <section class="story">
-    <div class="story__inner">
-      <Eyebrow text={`Since ${data.year}`} center />
-
-      <h2 class="story__heading" data-animate>
-        {data.storyHeading.map((line, i) => <>{i > 0 && <br />}{line}</>)}
-      </h2>
-
-      <div class="story__copy" data-animate>
-        <Story />
-      </div>
-    </div>
-  </section>
+  <!-- The origin story, from the Markdown body of the wheel's file -->
+  <StorySection eyebrow={`Since ${data.year}`} heading={data.storyHeading}>
+    <Story />
+  </StorySection>
 
 
   <!-- ============================================================
@@ -137,50 +124,6 @@ const specRows = [
 </BaseLayout>
 
 <style>
-  /* ============================================================
-     STORY
-  ============================================================ */
-  .story {
-    background: var(--parchment);
-    padding: 120px 40px;
-    text-align: center;
-  }
-
-  .story__inner {
-    max-width: 620px;
-    margin: 0 auto;
-  }
-
-  .story__heading {
-    font-family: var(--serif);
-    font-size: clamp(34px, 4vw, 52px);
-    font-weight: 300;
-    line-height: 1.2;
-    color: var(--ink);
-    margin-bottom: 44px;
-  }
-
-  /* The <p> tags come from Markdown, not from this file, so Astro's
-     scoping can't tag them. :global() lets these rules reach them —
-     still only inside .story__copy. */
-  .story__copy :global(p) {
-    font-size: 17px;
-    font-weight: 300;
-    line-height: 1.85;
-    color: var(--ink);
-    margin-bottom: 22px;
-  }
-
-  /* The closing line: "The Halden 71 is what they built." */
-  .story__copy :global(p:last-child) {
-    margin-bottom: 0;
-    font-family: var(--serif);
-    font-size: 22px;
-    font-style: italic;
-    color: var(--stone);
-  }
-
-
   /* ============================================================
      SPECS
   ============================================================ */
@@ -240,10 +183,6 @@ const specRows = [
   @media (max-width: 768px) {
     .archive {
       padding: 80px 28px 96px;
-    }
-
-    .story {
-      padding: 80px 28px;
     }
 
     /* Spec table above, swatches below */

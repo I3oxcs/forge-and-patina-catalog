@@ -1,0 +1,26 @@
+---
+/*
+ * NOT FOUND — 404
+ * Astro builds this as 404.html. GitHub Pages shows it automatically
+ * for any address that doesn't exist on the site.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import Button from '../components/Button.astro';
+import { url } from '../utils/url';
+---
+
+<BaseLayout title="Not found">
+  <PageIntro eyebrow="404" title={['Not in', 'the archive.']} fullHeight>
+    <p>This page doesn't exist — or hasn't been found yet.</p>
+    <div class="actions">
+      <Button href={url('wheels/')}>The Collection</Button>
+    </div>
+  </PageIntro>
+</BaseLayout>
+
+<style>
+  .actions {
+    margin-top: 36px;
+  }
+</style>

@@ -1,8 +1,232 @@
 ---
+/*
+ * HERITAGE — /heritage/
+ * The brand story, then a timeline. The timeline merges two sources:
+ * the four wheels (from the content collection) and three moments in
+ * the workshop's own history (written below). Both are turned into the
+ * same shape, combined, and sorted by year.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import StagePlaceholder from '../components/StagePlaceholder.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import StorySection from '../components/StorySection.astro';
+import PageIntro from '../components/PageIntro.astro';
+import Atelier from '../components/Atelier.astro';
+import { getWheels } from '../utils/wheels';
+import { url } from '../utils/url';
+import { shortName } from '../utils/format';
+
+// One shape for every row of the timeline. Only wheels have a link.
+interface Moment {
+  year: number;
+  label: string;
+  title: string;
+  text: string;
+  link?: { href: string; text: string };
+}
+
+const wheels = await getWheels();
+
+const wheelMoments: Moment[] = wheels.map(wheel => ({
+  year:  wheel.data.year,
+  label: wheel.data.origin,
+  title: wheel.data.name,
+  text:  wheel.data.summary,
+  link:  { href: url(`wheels/${wheel.id}/`), text: `Discover the ${shortName(wheel.data.name)}` },
+}));
+
+const workshopMoments: Moment[] = [
+  {
+    year:  1987,
+    label: 'The workshop',
+    title: 'The last order leaves Deutz',
+    text:  'The workshop closes. Its forging dies are sold for scrap, and the drawings disappear with them.',
+  },
+  {
+    year:  2017,
+    label: 'The archive',
+    title: 'The drawings are found',
+    text:  'Four folios of drawings turn up in a storage unit outside Stuttgart, in a crate marked only “Köln”.',
+  },
+  {
+    year:  2025,
+    label: 'The atelier',
+    title: 'Forge & Patina opens in Cologne',
+    text:  'New dies are cut from the original drawings. The first wheel to leave the atelier is a Halden 71.',
+  },
+];
+
+const timeline = [...wheelMoments, ...workshopMoments].sort((a, b) => a.year - b.year);
+const firstYear = timeline[0].year;
+const lastYear  = timeline[timeline.length - 1].year;
 ---
 
-<BaseLayout title="Heritage">
-  <StagePlaceholder label="Since 1958" title="Heritage" stage={4} />
+<BaseLayout
+  title="Heritage"
+  description="The story of Forge & Patina: a Cologne workshop's lost drawings, 1958–1983, found and reissued by craft."
+>
+
+  <PageIntro eyebrow={`Heritage · ${firstYear}–${lastYear}`} title={['The drawings', 'survived.']}>
+    For twenty-five years a small workshop in Cologne forged wheels for people
+    who raced their own cars. Then it closed, and its drawings went missing.
+  </PageIntro>
+
+
+  <StorySection eyebrow="The workshop" heading={['No name', 'above the door.']}>
+    <p>
+      The workshop stood in Deutz, across the Rhine from the cathedral. It never had a
+      sign. Drivers called it the forge, and came back every season with another car.
+    </p>
+    <p>
+      When it closed in 1987, the dies were scrapped and the drawings vanished. For thirty
+      years we believed they were gone. We found them in a storage unit outside Stuttgart.
+    </p>
+    <p>Everything we make begins with one of those drawings.</p>
+  </StorySection>
+
+
+  <!-- ============================================================
+       TIMELINE
+  ============================================================ -->
+  <section class="timeline">
+    <div class="timeline__inner">
+      <Eyebrow text="The archive" />
+      <h2 class="timeline__heading" data-animate>
+        {firstYear} to {lastYear}
+      </h2>
+
+      <ol class="timeline__list">
+        {timeline.map(moment => (
+          <li class="moment" data-animate>
+            <span class="moment__year">{moment.year}</span>
+            <div class="moment__body">
+              <span class="label">{moment.label}</span>
+              <h3 class="moment__title">{moment.title}</h3>
+              <p class="moment__text">{moment.text}</p>
+              {moment.link && (
+                <a href={moment.link.href} class="moment__link">{moment.link.text}</a>
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+
+  <Atelier />
+
 </BaseLayout>
+
+<style>
+  /* ============================================================
+     TIMELINE
+     Each row: the year in large serif on the left, the moment on
+     the right, divided by dust hairlines like the spec table.
+  ============================================================ */
+  .timeline {
+    background: var(--warm-white);
+    padding: 100px 40px 120px;
+  }
+
+  .timeline__inner {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .timeline__heading {
+    font-family: var(--serif);
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 300;
+    color: var(--ink);
+    margin-bottom: 52px;
+  }
+
+  .timeline__list {
+    list-style: none;
+  }
+
+  .moment {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 40px;
+    padding: 40px 0;
+    border-bottom: 1px solid var(--dust);
+  }
+
+  .moment:first-child {
+    border-top: 1px solid var(--dust);
+  }
+
+  .moment__year {
+    font-family: var(--serif);
+    font-size: 56px;
+    font-weight: 300;
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .moment__body .label {
+    margin-bottom: 8px;
+  }
+
+  .moment__title {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+
+  .moment__text {
+    max-width: 560px;
+    font-size: 15px;
+    line-height: 1.85;
+    color: var(--stone);
+  }
+
+  /* Text link with the nav's slide-in bronze underline */
+  .moment__link {
+    display: inline-block;
+    position: relative;
+    margin-top: 18px;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--bronze);
+  }
+
+  .moment__link::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--bronze);
+    transition: width 300ms ease;
+  }
+
+  .moment__link:hover::after {
+    width: 100%;
+  }
+
+
+  @media (max-width: 768px) {
+    .timeline {
+      padding: 80px 28px 96px;
+    }
+
+    /* Year sits above the moment instead of beside it */
+    .moment {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      padding: 32px 0;
+    }
+
+    .moment__year {
+      font-size: 44px;
+    }
+  }
+</style>

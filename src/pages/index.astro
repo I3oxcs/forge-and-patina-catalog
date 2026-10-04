@@ -1,8 +1,153 @@
 ---
+/*
+ * HOME — /
+ * Brand hero, a short heritage teaser, the whole collection, and the
+ * atelier. Almost everything here is a component already built for
+ * the wheel pages, arranged differently.
+ */
 import BaseLayout from '../layouts/BaseLayout.astro';
-import StagePlaceholder from '../components/StagePlaceholder.astro';
+import SplitHero from '../components/SplitHero.astro';
+import Eyebrow from '../components/Eyebrow.astro';
+import StorySection from '../components/StorySection.astro';
+import Button from '../components/Button.astro';
+import WheelGrid from '../components/WheelGrid.astro';
+import Atelier from '../components/Atelier.astro';
+import { getWheels } from '../utils/wheels';
+import { url } from '../utils/url';
+
+const wheels = await getWheels();
+const firstYear = wheels[0].data.year;
+const lastYear  = wheels[wheels.length - 1].data.year;
+
+// The Halden 71 was the original site's subject; its photo leads here too.
+const flagship = wheels.find(wheel => wheel.id === 'halden-71') ?? wheels[0];
 ---
 
-<BaseLayout>
-  <StagePlaceholder label="Forge & Patina" title="Home" stage={4} />
+<BaseLayout description="Forge & Patina. Heritage forged wheels from the archive, reissued by craft in Cologne.">
+
+  <SplitHero
+    title={['Forge &', 'Patina']}
+    label="Heritage wheels · Cologne"
+    tagline={[`Four wheels from the archive, ${firstYear}–${lastYear}.`, 'Reissued by craft.']}
+    cta={{ href: url('wheels/'), text: 'The Collection' }}
+    image={flagship.data.images[0]}
+    placeholderSwatch={flagship.data.finishes[0].swatch}
+  />
+
+
+  <!-- ============================================================
+       HERITAGE TEASER
+       The origin story in three lines, then a way into the full one.
+  ============================================================ -->
+  <StorySection eyebrow={`Since ${firstYear}`} heading={['Four drawings.', 'Twenty-five years.']}>
+    <p>
+      For a quarter of a century, a small Cologne workshop forged wheels for the
+      privateers of German motor racing — at Solitude, at the Nürburgring, at Le Mans.
+    </p>
+    <p>
+      The workshop closed. Its drawings were lost for thirty years, until we found
+      them in a storage unit outside Stuttgart.
+    </p>
+    <p>Every wheel we make begins with one of them.</p>
+
+    <Button slot="after" href={url('heritage/')}>Our heritage</Button>
+  </StorySection>
+
+
+  <!-- ============================================================
+       THE COLLECTION — the same cards as the catalog page
+  ============================================================ -->
+  <section class="collection">
+    <div class="collection__inner">
+      <div class="collection__header">
+        <div>
+          <Eyebrow text="The Collection" />
+          <h2 class="collection__heading" data-animate>From the archive</h2>
+        </div>
+        <a href={url('wheels/')} class="collection__link" data-animate>
+          View the collection
+        </a>
+      </div>
+
+      <WheelGrid wheels={wheels} headingLevel={3} />
+    </div>
+  </section>
+
+
+  <Atelier />
+
 </BaseLayout>
+
+<style>
+  /* ============================================================
+     THE COLLECTION
+  ============================================================ */
+  .collection {
+    background: var(--warm-white);
+    padding: 100px 40px 120px;
+  }
+
+  .collection__inner {
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  /* Heading on the left, "View the collection" on the right */
+  .collection__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 52px;
+  }
+
+  .collection__heading {
+    font-family: var(--serif);
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 300;
+    color: var(--ink);
+  }
+
+  /* Text link with the nav's slide-in bronze underline */
+  .collection__link {
+    position: relative;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--stone);
+    white-space: nowrap;
+    transition: color 300ms ease;
+  }
+
+  .collection__link::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--bronze);
+    transition: width 300ms ease;
+  }
+
+  .collection__link:hover {
+    color: var(--ink);
+  }
+
+  .collection__link:hover::after {
+    width: 100%;
+  }
+
+
+  @media (max-width: 768px) {
+    .collection {
+      padding: 80px 28px 96px;
+    }
+
+    .collection__header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+</style>

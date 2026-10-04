@@ -6,7 +6,7 @@
  * the shortest lead time all come from the wheel files.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import Eyebrow from '../../components/Eyebrow.astro';
+import PageIntro from '../../components/PageIntro.astro';
 import WheelGrid from '../../components/WheelGrid.astro';
 import { getWheels } from '../../utils/wheels';
 
@@ -22,22 +22,14 @@ const shortestLeadTime = Math.min(...wheels.map(wheel => wheel.data.leadTimeWeek
   description={`Every Forge & Patina wheel, ${firstYear}–${lastYear}. Reissued from the original drawings in Cologne.`}
 >
 
-  <!-- ============================================================
-       INTRO — ink band, so the transparent header sits on dark
-  ============================================================ -->
-  <section class="intro">
-    <div class="intro__inner">
-      <Eyebrow text={`The Collection · ${firstYear}–${lastYear}`} />
-      <h1 class="intro__title" data-animate>
-        Four wheels.<br />Four decades.
-      </h1>
-      <p class="intro__copy" data-animate data-delay="150">
-        Each was drawn for a single purpose: a circuit, a race, a kind of driving.
-        Each is reissued from its original drawings at our Cologne atelier and made
-        to order, from {shortestLeadTime} weeks.
-      </p>
-    </div>
-  </section>
+  <PageIntro
+    eyebrow={`The Collection · ${firstYear}–${lastYear}`}
+    title={['Four wheels.', 'Four decades.']}
+  >
+    Each was drawn for a single purpose: a circuit, a race, a kind of driving.
+    Each is reissued from its original drawings at our Cologne atelier and made
+    to order, from {shortestLeadTime} weeks.
+  </PageIntro>
 
 
   <!-- ============================================================
@@ -52,33 +44,6 @@ const shortestLeadTime = Math.min(...wheels.map(wheel => wheel.data.leadTimeWeek
 </BaseLayout>
 
 <style>
-  .intro {
-    background: var(--ink);
-    padding: calc(var(--header-height) + 120px) 40px 100px;
-  }
-
-  .intro__inner {
-    max-width: 1240px;
-    margin: 0 auto;
-  }
-
-  .intro__title {
-    font-family: var(--serif);
-    font-size: clamp(48px, 6vw, 88px);
-    font-weight: 300;
-    line-height: 1.0;
-    letter-spacing: 0.02em;
-    color: var(--parchment);
-    margin-bottom: 32px;
-  }
-
-  .intro__copy {
-    max-width: 520px;
-    font-size: 15px;
-    line-height: 1.9;
-    color: var(--stone);
-  }
-
   .collection {
     background: var(--parchment);
     padding: 100px 40px 120px;
@@ -90,10 +55,6 @@ const shortestLeadTime = Math.min(...wheels.map(wheel => wheel.data.leadTimeWeek
   }
 
   @media (max-width: 768px) {
-    .intro {
-      padding: calc(var(--header-height) + 64px) 28px 72px;
-    }
-
     .collection {
       padding: 72px 28px 96px;
     }

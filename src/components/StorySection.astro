@@ -1,0 +1,95 @@
+---
+/*
+ * STORY SECTION
+ * Spare, editorial, centred text: eyebrow, serif heading, then a few
+ * short paragraphs. The last paragraph is the punchline, set in italic.
+ *
+ *   <StorySection eyebrow="Since 1971" heading={['Forged for endurance.', 'Reissued by craft.']}>
+ *     <p>First paragraph…</p>
+ *     <p>The punchline.</p>
+ *     <Button slot="after" href="…">Read more</Button>    ← optional, goes below
+ *   </StorySection>
+ */
+import Eyebrow from './Eyebrow.astro';
+
+interface Props {
+  eyebrow: string;
+  heading: string[];   // one entry per line
+}
+
+const { eyebrow, heading } = Astro.props;
+---
+
+<section class="story">
+  <div class="story__inner">
+    <Eyebrow text={eyebrow} center />
+
+    <h2 class="story__heading" data-animate>
+      {heading.map((line, i) => <>{i > 0 && <br />}{line}</>)}
+    </h2>
+
+    <!-- Default slot: the paragraphs -->
+    <div class="story__copy" data-animate data-delay="150">
+      <slot />
+    </div>
+
+    <!-- Named slot: anything marked slot="after", e.g. a button -->
+    {Astro.slots.has('after') && (
+      <div class="story__after" data-animate data-delay="300">
+        <slot name="after" />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .story {
+    background: var(--parchment);
+    padding: 120px 40px;
+    text-align: center;
+  }
+
+  .story__inner {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  .story__heading {
+    font-family: var(--serif);
+    font-size: clamp(34px, 4vw, 52px);
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 44px;
+  }
+
+  /* The <p> tags come from whoever uses this component (or from
+     Markdown), not from this file, so Astro's scoping can't tag them.
+     :global() lets these rules reach them — still only inside .story__copy. */
+  .story__copy :global(p) {
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.85;
+    color: var(--ink);
+    margin-bottom: 22px;
+  }
+
+  /* The closing line: "The Halden 71 is what they built." */
+  .story__copy :global(p:last-child) {
+    margin-bottom: 0;
+    font-family: var(--serif);
+    font-size: 22px;
+    font-style: italic;
+    color: var(--stone);
+  }
+
+  .story__after {
+    margin-top: 48px;
+  }
+
+  @media (max-width: 768px) {
+    .story {
+      padding: 80px 28px;
+    }
+  }
+</style>

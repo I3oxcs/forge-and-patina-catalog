@@ -13,7 +13,7 @@ import WheelPlaceholder from './WheelPlaceholder.astro';
 import type { SwatchKey } from '../data/swatches';
 
 interface Props {
-  title: string;                                // "The Halden 71"
+  title: string | string[];                     // "The Halden 71", or lines: ["Forge &", "Patina"]
   tagline: string[];                            // one entry per line
   label?: string;                               // small brand mark above
   cta: { href: string; text: string };
@@ -30,11 +30,13 @@ const {
   placeholderSwatch,
 } = Astro.props;
 
-// "The Halden 71" → ["The", "Halden 71"], shown on two lines like the original.
-const firstSpace = title.indexOf(' ');
-const titleLines = firstSpace === -1
-  ? [title]
-  : [title.slice(0, firstSpace), title.slice(firstSpace + 1)];
+// Lines passed in are used as they are. A single string is split after
+// its first word: "The Halden 71" → ["The", "Halden 71"], like the original.
+function toLines(text: string) {
+  const firstSpace = text.indexOf(' ');
+  return firstSpace === -1 ? [text] : [text.slice(0, firstSpace), text.slice(firstSpace + 1)];
+}
+const titleLines = Array.isArray(title) ? title : toLines(title);
 ---
 
 <section class="hero">
