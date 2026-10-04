@@ -1,0 +1,84 @@
+---
+/*
+ * SIZE SELECTOR
+ * One toggle button per diameter. Visual only for now — it marks the
+ * chosen size but doesn't send it anywhere.
+ */
+import { formatSize } from '../utils/format';
+
+interface Props {
+  sizes: number[];
+}
+
+const { sizes } = Astro.props;
+---
+
+<div class="sizes">
+  <span class="label">Diameter</span>
+  <div class="size-options" role="group" aria-label="Select diameter">
+    {sizes.map((size, i) => (
+      <button
+        type="button"
+        class:list={['size-option', { active: i === 0 }]}
+        aria-pressed={i === 0 ? 'true' : 'false'}
+      >
+        {formatSize(size)}
+      </button>
+    ))}
+  </div>
+</div>
+
+<style>
+  .sizes .label {
+    margin-bottom: 14px;
+  }
+
+  .size-options {
+    display: flex;
+    gap: 10px;
+  }
+
+  .size-option {
+    border: 1px solid var(--dust);
+    padding: 10px 22px;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--stone);
+    transition: border-color 300ms ease, color 300ms ease, background 300ms ease;
+  }
+
+  .size-option:hover,
+  .size-option.active {
+    border-color: var(--bronze);
+    color: var(--ink);
+    background: rgba(184, 130, 74, 0.06);
+  }
+</style>
+
+<script>
+  // ─────────────────────────────────────────────────────────────
+  // SIZE OPTION SELECTOR
+  //
+  // Astro includes this script once per page, even if the component
+  // appears several times — so it handles every group it finds, and
+  // a click only affects buttons in its own group.
+  //
+  // aria-pressed tells screen readers which button is selected.
+  // ─────────────────────────────────────────────────────────────
+
+  document.querySelectorAll('.size-options').forEach(group => {
+    const buttons = group.querySelectorAll('.size-option');
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        buttons.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-pressed', 'false');
+        });
+        btn.classList.add('active');
+        btn.setAttribute('aria-pressed', 'true');
+      });
+    });
+  });
+</script>

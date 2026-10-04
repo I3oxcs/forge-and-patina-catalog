@@ -1,0 +1,62 @@
+---
+/*
+ * WHEEL PLACEHOLDER
+ * Stands in for a photograph that hasn't been taken yet: a disc in the
+ * wheel's first finish, ringed by a bronze hairline, on ink.
+ * It fills whatever box it's placed in.
+ *
+ * As soon as a wheel's data gets an image, pages show the photo
+ * instead — nothing else needs to change.
+ */
+import { swatches, type SwatchKey } from '../data/swatches';
+
+interface Props {
+  swatch: SwatchKey;
+  label?: string;
+}
+
+const { swatch, label = 'Photograph forthcoming' } = Astro.props;
+---
+
+<div class="placeholder">
+  <div class="placeholder__disc" style={{ background: swatches[swatch] }} aria-hidden="true"></div>
+  <span class="label">{label}</span>
+</div>
+
+<style>
+  .placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 44px;
+    padding: 40px;
+    /* A faint glow so the panel reads as separate from neighbouring ink */
+    background:
+      radial-gradient(circle at center, rgba(244, 239, 230, 0.04), transparent 70%),
+      var(--ink);
+  }
+
+  /* The wheel: finish-coloured disc + bronze hairline ring around it */
+  .placeholder__disc {
+    position: relative;
+    width: min(56%, 360px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 14px var(--ink),
+      0 0 0 15px rgba(184, 130, 74, 0.45);
+  }
+
+  /* The hub */
+  .placeholder__disc::after {
+    content: '';
+    position: absolute;
+    inset: 41%;
+    border-radius: 50%;
+    background: var(--ink);
+    box-shadow: 0 0 0 1px rgba(184, 130, 74, 0.45);
+  }
+</style>

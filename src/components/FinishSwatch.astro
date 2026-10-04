@@ -1,0 +1,60 @@
+---
+/*
+ * FINISH SWATCH
+ * A colour block for one finish, with its name and code beside it.
+ * The colours live in src/data/swatches.ts.
+ */
+import { swatches, type SwatchKey } from '../data/swatches';
+
+interface Props {
+  name: string;      // "Polished Bronze"
+  code: string;      // "PB-71"
+  swatch: SwatchKey;
+}
+
+const { name, code, swatch } = Astro.props;
+---
+
+<div class="finish">
+  <div
+    class="finish__swatch"
+    style={{ background: swatches[swatch] }}
+    role="img"
+    aria-label={`${name} colour swatch`}
+  ></div>
+  <div>
+    <span class="finish__name">{name}</span>
+    <span class="finish__code">{code}</span>
+  </div>
+</div>
+
+<style>
+  .finish {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+
+  .finish__swatch {
+    width: 84px;
+    height: 84px;
+    flex-shrink: 0;
+  }
+
+  .finish__name {
+    display: block;
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--ink);
+    margin-bottom: 5px;
+  }
+
+  .finish__code {
+    font-family: var(--sans);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--stone);
+  }
+</style>

@@ -1,0 +1,66 @@
+---
+/*
+ * BUTTON
+ * Bronze border, transparent fill. On hover, a bronze fill slides in
+ * from the left beneath the text.
+ *
+ *   <Button href="#specs">Configure</Button>
+ *
+ * Any other attribute (data-hero, aria-label…) is passed straight
+ * through to the <a>, thanks to `...rest` below.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+// "Accept everything a normal <a> accepts, but href is required."
+interface Props extends HTMLAttributes<'a'> {
+  href: string;
+}
+
+const { href, ...rest } = Astro.props;
+---
+
+<a href={href} class="btn" {...rest}>
+  <span class="btn__text"><slot /></span>
+</a>
+
+<style>
+  .btn {
+    display: inline-block;
+    padding: 14px 36px;
+    border: 1px solid var(--bronze);
+    font-family: var(--sans);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--bronze);
+    position: relative;
+    overflow: hidden;
+    transition: color 350ms ease;
+  }
+
+  /* Text sits on top of the fill (z-index: 1 > pseudo-element z-index: 0) */
+  .btn__text {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* The fill that slides in from the left on hover */
+  .btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--bronze);
+    transform: translateX(-101%);   /* start fully off-screen to the left */
+    transition: transform 350ms ease;
+    z-index: 0;
+  }
+
+  .btn:hover::before {
+    transform: translateX(0);       /* slide into view */
+  }
+
+  .btn:hover {
+    color: var(--ink);              /* text goes dark on the bronze fill */
+  }
+</style>

@@ -1,0 +1,53 @@
+---
+/*
+ * SPEC TABLE
+ * Technical data as label/value rows. The page decides which rows
+ * to show; this component only decides how they look.
+ *
+ * dl (definition list) is the correct semantic element for spec data.
+ */
+interface Props {
+  rows: { label: string; value: string }[];
+}
+
+const { rows } = Astro.props;
+---
+
+<dl class="specs-table">
+  {rows.map(({ label, value }) => (
+    <div class="specs-table__row">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  ))}
+</dl>
+
+<style>
+  .specs-table__row {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--dust);
+  }
+
+  .specs-table__row:first-child {
+    border-top: 1px solid var(--dust);
+  }
+
+  dt {
+    font-family: var(--sans);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--stone);
+    padding-top: 2px;   /* optical alignment with dd */
+  }
+
+  dd {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--ink);
+  }
+</style>

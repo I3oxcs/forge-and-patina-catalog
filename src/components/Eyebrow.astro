@@ -1,0 +1,28 @@
+---
+/*
+ * EYEBROW
+ * The small uppercase label + bronze hairline that sits above
+ * almost every heading on the site ("SINCE 1971", "TECHNICAL DATA").
+ *
+ *   <Eyebrow text="Technical Data" />
+ *   <Eyebrow text="Since 1971" center />          centred, for centred sections
+ *   <Eyebrow text="Finishes" animate={false} />   when the parent already fades in
+ */
+interface Props {
+  text: string;
+  center?: boolean;
+  animate?: boolean;
+}
+
+const { text, center = false, animate = true } = Astro.props;
+---
+
+<span class="label" data-animate={animate ? '' : undefined}>{text}</span>
+<div class:list={['rule', { 'rule--center': center }]} data-animate={animate ? '' : undefined}></div>
+
+<style>
+  /* .label and .rule come from global.css; only the variant lives here */
+  .rule--center {
+    margin: 18px auto 32px;
+  }
+</style>

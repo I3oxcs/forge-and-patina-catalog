@@ -1,0 +1,133 @@
+---
+/*
+ * ATELIER
+ * Workshop image runs full width across the top.
+ * Below: generous negative space on the left, text on the right.
+ * The emptiness is intentional — it lets the paragraph breathe.
+ *
+ *   <Atelier />                        "Each wheel is assembled…"
+ *   <Atelier wheelName="Halden 71" />  "Each Halden 71 is assembled…"
+ */
+import { Image } from 'astro:assets';
+import Eyebrow from './Eyebrow.astro';
+import workshop from '../assets/atelier/workshop.jpg';
+
+interface Props {
+  wheelName?: string;
+}
+
+const { wheelName = 'wheel' } = Astro.props;
+---
+
+<section class="construction" id="atelier">
+
+  <div class="construction__image" data-animate>
+    <Image
+      src={workshop}
+      alt="The Forge & Patina atelier, Cologne"
+      widths={[800, 1400, 2000]}
+      sizes="100vw"
+    />
+  </div>
+
+  <div class="construction__body">
+
+    <!-- Intentional negative space — left column is empty by design -->
+    <div aria-hidden="true"></div>
+
+    <div class="construction__text">
+      <Eyebrow text="Atelier" />
+      <h2 class="construction__heading" data-animate>
+        Built by hand.<br />One wheel<br />at a time.
+      </h2>
+      <div class="construction__copy">
+        <p data-animate>
+          Each {wheelName} is assembled by a single craftsman at our Cologne atelier.
+          From the first cut of the billet to the final torque check, it is machined,
+          finished and inspected over four working days.
+        </p>
+        <p data-animate data-delay="150">
+          Nothing leaves until it is correct.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+<style>
+  .construction {
+    background: var(--ink);
+    padding-bottom: 100px;
+  }
+
+  .construction__image {
+    width: 100%;
+    height: 520px;
+    overflow: hidden;
+  }
+
+  .construction__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+  }
+
+  /* 55% negative space / 45% text content */
+  .construction__body {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 80px 40px 0;
+    display: grid;
+    grid-template-columns: 55fr 45fr;
+    gap: 60px;
+  }
+
+  .construction__heading {
+    font-family: var(--serif);
+    font-size: clamp(30px, 3.5vw, 48px);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--parchment);
+    margin-bottom: 30px;
+  }
+
+  .construction__copy {
+    font-family: var(--sans);
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.85;
+    color: var(--stone);
+  }
+
+  .construction__copy p + p {
+    margin-top: 16px;
+  }
+
+  /* The closing line — restrained, emphatic */
+  .construction__copy p:last-child {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-style: italic;
+    color: rgba(138, 127, 118, 0.8);
+  }
+
+  @media (max-width: 768px) {
+    /* Image shorter, text below (no negative space column) */
+    .construction__image {
+      height: 280px;
+    }
+
+    .construction__body {
+      grid-template-columns: 1fr;
+      padding: 56px 28px 0;
+    }
+
+    /* Hide the intentional blank column on mobile — space is precious */
+    .construction__body > div:first-child {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,217 @@
+---
+/*
+ * WHEEL PAGE TEMPLATE
+ * One file, one page per wheel. The [slug] in the filename is a
+ * placeholder: getStaticPaths() below tells Astro which values to
+ * fill in, and Astro builds this template once for each.
+ *
+ *   src/content/wheels/halden-71.md  →  /wheels/halden-71/
+ */
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SplitHero from '../../components/SplitHero.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import SpecTable from '../../components/SpecTable.astro';
+import SizeSelector from '../../components/SizeSelector.astro';
+import FinishSwatch from '../../components/FinishSwatch.astro';
+import Gallery from '../../components/Gallery.astro';
+import Atelier from '../../components/Atelier.astro';
+import { formatPrice, formatSize, formatSizes, shortName } from '../../utils/format';
+
+// Runs once, at build time. Returns one entry per page to create:
+// `params` fills in [slug]; `props` is handed to that page.
+export async function getStaticPaths() {
+  const wheels = await getCollection('wheels');
+  return wheels.map(wheel => ({
+    params: { slug: wheel.id },
+    props:  { wheel },
+  }));
+}
+
+interface Props {
+  wheel: CollectionEntry<'wheels'>;
+}
+
+const { wheel } = Astro.props;
+const data = wheel.data;
+
+// The Markdown body (the origin story), ready to drop into the page.
+const { Content: Story } = await render(wheel);
+
+// The technical data, in display order.
+const specRows = [
+  { label: 'Construction', value: data.construction },
+  { label: 'Material',     value: data.material },
+  ...data.details,
+  { label: 'Diameters',    value: formatSizes(data.sizes) },
+  { label: `Weight (${formatSize(data.weight.size)})`, value: `${data.weight.kg} kg` },
+  { label: 'PCD',          value: data.pcd },
+  { label: 'Lead time',    value: `${data.leadTimeWeeks} weeks from order` },
+  { label: 'Price',        value: `${formatPrice(data.price)} per wheel` },
+];
+---
+
+<BaseLayout title={data.name} description={data.summary}>
+
+  <SplitHero
+    title={data.name}
+    tagline={data.tagline}
+    cta={{ href: '#specs', text: 'Configure' }}
+    image={data.images[0]}
+    placeholderSwatch={data.finishes[0].swatch}
+  />
+
+
+  <!-- ============================================================
+       STORY
+       The origin story from the Markdown file. Spare, editorial,
+       centred. The last paragraph is the punchline.
+  ============================================================ -->
+  <section class="story">
+    <div class="story__inner">
+      <Eyebrow text={`Since ${data.year}`} center />
+
+      <h2 class="story__heading" data-animate>
+        {data.storyHeading.map((line, i) => <>{i > 0 && <br />}{line}</>)}
+      </h2>
+
+      <div class="story__copy" data-animate>
+        <Story />
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       SPECS
+       Technical data on the left. Finish swatches on the right.
+  ============================================================ -->
+  <section class="specs" id="specs">
+    <div class="specs__inner">
+
+      <div>
+        <Eyebrow text="Technical Data" />
+        <h2 class="specs__heading" data-animate>{data.name}</h2>
+
+        <div data-animate>
+          <SpecTable rows={specRows} />
+        </div>
+
+        <div class="specs__sizes" data-animate data-delay="150">
+          <SizeSelector sizes={data.sizes} />
+        </div>
+      </div>
+
+      <div data-animate data-delay="250">
+        <Eyebrow text="Available Finishes" animate={false} />
+        <div class="finishes">
+          {data.finishes.map(finish => <FinishSwatch {...finish} />)}
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+
+  <Gallery images={data.images} caption={`${data.name} — ${data.finishes[0].name}`} />
+
+  <Atelier wheelName={shortName(data.name)} />
+
+</BaseLayout>
+
+<style>
+  /* ============================================================
+     STORY
+  ============================================================ */
+  .story {
+    background: var(--parchment);
+    padding: 120px 40px;
+    text-align: center;
+  }
+
+  .story__inner {
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  .story__heading {
+    font-family: var(--serif);
+    font-size: clamp(34px, 4vw, 52px);
+    font-weight: 300;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 44px;
+  }
+
+  /* The <p> tags come from Markdown, not from this file, so Astro's
+     scoping can't tag them. :global() lets these rules reach them —
+     still only inside .story__copy. */
+  .story__copy :global(p) {
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.85;
+    color: var(--ink);
+    margin-bottom: 22px;
+  }
+
+  /* The closing line: "The Halden 71 is what they built." */
+  .story__copy :global(p:last-child) {
+    margin-bottom: 0;
+    font-family: var(--serif);
+    font-size: 22px;
+    font-style: italic;
+    color: var(--stone);
+  }
+
+
+  /* ============================================================
+     SPECS
+  ============================================================ */
+  .specs {
+    background: var(--warm-white);
+    padding: 100px 40px;
+  }
+
+  .specs__inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .specs__heading {
+    font-family: var(--serif);
+    font-size: clamp(28px, 3vw, 40px);
+    font-weight: 300;
+    color: var(--ink);
+    margin-bottom: 36px;
+  }
+
+  .specs__sizes {
+    margin-top: 44px;
+  }
+
+  .finishes {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  @media (max-width: 768px) {
+    .story {
+      padding: 80px 28px;
+    }
+
+    /* Spec table above, swatches below */
+    .specs {
+      padding: 80px 28px;
+    }
+
+    .specs__inner {
+      grid-template-columns: 1fr;
+      gap: 52px;
+    }
+  }
+</style>
